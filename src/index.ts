@@ -389,7 +389,7 @@ export class Prism<S, A> {
   }
 }
 
-const somePrism = new Prism<Option<any>, any>(s => s, a => some(a))
+const somePrism = new Prism<Option<any>, any>(identity, some)
 
 function optionalFromNullableProp<S, K extends keyof S>(k: K): Optional<S, NonNullable<S[K]>> {
   return new Optional((s: any) => fromNullable(s[k]), a => s => ({ ...s, [k as any]: a }))
@@ -399,7 +399,7 @@ type OptionPropertyNames<S> = { [K in keyof S]: S[K] extends Option<any> ? K : n
 type OptionPropertyType<S, K extends OptionPropertyNames<S>> = S[K] extends Option<infer A> ? A : never
 
 function optionalFromOptionProp<S, K extends OptionPropertyNames<S>>(k: K): Optional<S, OptionPropertyType<S, K>> {
-  return Lens.fromProp<S>()(k).composePrism(Prism.some() as Prism<any, any>)
+  return lensFromProp<S, K>(k).composePrism(somePrism as any)
 }
 
 /*
